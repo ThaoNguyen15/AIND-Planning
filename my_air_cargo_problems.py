@@ -186,35 +186,14 @@ class AirCargoProblem(Problem):
         executed.
         '''
         # TODO implement (see Russell-Norvig Ed-3 10.2.3  or Russell-Norvig Ed-2 11.2)
-        # Only care about the POSITIVE result
-        # Find the minimum set of actions that achieve all the state goals
-        # Get the goal states that are unrealized
+        # Assume sub-goal independence
         unrealized_goals = []
         kb = PropKB()
         kb.tell(decode_state(node.state, self.state_map).pos_sentence())
+        count = 0
         for clause in self.goal:
             if clause not in kb.clauses:
-                unrealized_goals.append(clause)
-        unrealized_goals_set = set(unrealized_goals)
-        actions = self.actions_list
-        # find the minimum set of actions that required to achieve all goal states
-        # Greedy Algorithm (approximation only) -> not admissible
-        # At each stage, choose the set that satisfied the most unsatisfied subgoals
-        count = 0
-        while len(unrealized_goals_set) > 0:
-            max_achieved_goals = 0
-            achieved_goals = []
-            for a in actions:
-                overlapping = set(a.effect_add).intersection(unrealized_goals_set)
-                overlapping_count = len(overlapping)
-                if overlapping_count > max_achieved_goals:
-                    max_achieved_goals = overlapping_count
-                    achieved_goals = overlapping
-            # remove achieved_goals from unrealized_goals_set
-            if max_achieved_goals == 0:
-                return ValueError('Planning Problem does not have a solution')
-            unrealized_goals_set = unrealized_goals_set.difference(achieved_goals)
-            count += 1        
+                count += 1
         return count
 
     
